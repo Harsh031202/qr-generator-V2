@@ -3,7 +3,6 @@
 import * as React from "react";
 import { QrCode, ScanLine, History, ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "../ui/theme-toggle";
-import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 
 export type WorkspaceTab = "create" | "scan" | "history";
@@ -20,7 +19,7 @@ export function Header({
   historyCount = 0,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-13 w-full items-center justify-between border-b border-border-subtle bg-surface/90 backdrop-blur-md px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-13 w-full items-center justify-between border-b border-border-subtle bg-surface px-4 sm:px-6">
       {/* Brand & Identity */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
@@ -30,12 +29,6 @@ export function Header({
           <span className="font-semibold text-sm tracking-tight text-foreground select-none">
             QR Studio
           </span>
-        </div>
-
-        <div className="hidden sm:flex items-center">
-          <Badge variant="subtle" className="text-[10px] text-foreground-muted">
-            v1.0
-          </Badge>
         </div>
       </div>
 

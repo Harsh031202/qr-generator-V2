@@ -26,13 +26,19 @@ import {
   Copy,
   CheckCircle2,
   Sliders,
-  Palette,
   Shield,
   Layers,
-  Sparkles,
-  ArrowRight,
+  AlertTriangle,
 } from "lucide-react";
 import type { QRContentType, QRPatternStyle, QRErrorCorrection } from "@/types/qr";
+import { validateUrl, validateHexColor } from "@/lib/validation/qr-validators";
+import {
+  generateQRSvg,
+  generateQRPngDataUrl,
+  downloadFile,
+  downloadDataUrl,
+  getContrastRatio,
+} from "@/lib/qr/generator";
 
 const CONTENT_TYPES: SegmentOption<QRContentType>[] = [
   { value: "url", label: "URL", icon: <Globe className="h-3.5 w-3.5" /> },
@@ -66,10 +72,123 @@ export default function WorkspacePage() {
   const [fgColor, setFgColor] = React.useState("#0f172a");
   const [bgColor, setBgColor] = React.useState("#ffffff");
   const [copied, setCopied] = React.useState(false);
+  const [svgMarkup, setSvgMarkup] = React.useState<string>("");
+  const [isExporting, setIsExporting] = React.useState(false);
 
-  const handleCopyMock = () => {
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+  // Validate URL with decoupled functional validator
+  const urlValidation = React.useMemo(() => {
+    return validateUrl(urlInput);
+  }, [urlInput]);
+
+  // Compute contrast ratio to ensure scannability
+  const contrastRatio = React.useMemo(() => {
+    if (validateHexColor(fgColor) && validateHexColor(bgColor)) {
+      return getContrastRatio(fgColor, bgColor);
+    }
+    return 21;
+  }, [fgColor, bgColor]);
+
+  const isLowContrast = contrastRatio < 3.0;
+
+  // Real-time client-side SVG generation
+  React.useEffect(() => {
+    let isCancelled = false;
+
+    async function updateQR() {
+      if (!urlInput.trim()) {
+        setSvgMarkup("");
+        return;
+      }
+
+      try {
+        const svg = await generateQRSvg(urlInput.trim(), {
+          errorCorrection: ecc,
+          margin,
+          foregroundColor: fgColor,
+          backgroundColor: bgColor,
+          pattern,
+        });
+
+        if (!isCancelled) {
+          setSvgMarkup(svg);
+        }
+      } catch {
+        if (!isCancelled) {
+          setSvgMarkup("");
+        }
+      }
+    }
+
+    updateQR();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [urlInput, ecc, margin, fgColor, bgColor, pattern]);
+
+  // Client-side SVG download
+  const handleDownloadSvg = async () => {
+    if (!urlInput.trim() || isExporting) return;
+    setIsExporting(true);
+    try {
+      const svg = await generateQRSvg(urlInput.trim(), {
+        errorCorrection: ecc,
+        margin,
+        foregroundColor: fgColor,
+        backgroundColor: bgColor,
+      });
+      downloadFile(svg, "qr-studio-code.svg", "image/svg+xml");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Client-side PNG download
+  const handleDownloadPng = async () => {
+    if (!urlInput.trim() || isExporting) return;
+    setIsExporting(true);
+    try {
+      const dataUrl = await generateQRPngDataUrl(urlInput.trim(), 1024, {
+        errorCorrection: ecc,
+        margin,
+        foregroundColor: fgColor,
+        backgroundColor: bgColor,
+      });
+      downloadDataUrl(dataUrl, "qr-studio-code.png");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Clipboard copy
+  const handleCopy = async () => {
+    if (!urlInput.trim()) return;
+    try {
+      const dataUrl = await generateQRPngDataUrl(urlInput.trim(), 512, {
+        errorCorrection: ecc,
+        margin,
+        foregroundColor: fgColor,
+        backgroundColor: bgColor,
+      });
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blob,
+        }),
+      ]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback to copying URL string
+      try {
+        await navigator.clipboard.writeText(urlInput.trim());
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        // clipboard unavailable
+      }
+    }
   };
 
   return (
@@ -83,39 +202,39 @@ export default function WorkspacePage() {
       <Shell>
         {activeTab === "create" ? (
           <div className="flex flex-col gap-6">
-            {/* Workspace Banner / Status */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border-subtle">
+            {/* Clean Functional Workspace Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
-                <h1 className="text-base font-semibold tracking-tight text-foreground">
+                <h1 className="text-sm font-semibold tracking-tight text-foreground">
                   QR Studio Workspace
                 </h1>
                 <p className="text-xs text-foreground-secondary mt-0.5">
-                  Phase 1 Foundation: Architecture, Layout & Design System
+                  Real-time client-side QR generation and vector export
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <Badge variant="success" dot>
-                  Design System Active
-                </Badge>
-                <Badge variant="subtle">
-                  Client-Side Engine
-                </Badge>
+                {isLowContrast ? (
+                  <Badge variant="warning" dot>
+                    Low Contrast ({contrastRatio.toFixed(1)}:1)
+                  </Badge>
+                ) : (
+                  <Badge variant="success" dot>
+                    Contrast Optimal ({contrastRatio.toFixed(1)}:1)
+                  </Badge>
+                )}
               </div>
             </div>
 
-            {/* Split Workspace Grid */}
+            {/* Split Workspace Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* LEFT COLUMN: Controls & Configuration (7 cols) */}
+              {/* LEFT COLUMN: Configuration Panels (7 cols) */}
               <div className="lg:col-span-7 flex flex-col gap-5">
-                {/* 1. Content Type Switcher */}
+                {/* Content Configuration */}
                 <div className="rounded-xl border border-border-subtle bg-surface p-4 shadow-panel">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                       Content Type
-                    </span>
-                    <span className="text-[11px] text-foreground-muted">
-                      Standard Compliant
                     </span>
                   </div>
 
@@ -128,9 +247,8 @@ export default function WorkspacePage() {
                     />
                   </div>
 
-                  {/* Active Type Form Field Preview */}
                   <div className="mt-4 pt-4 border-t border-border-subtle">
-                    <Label required hint="Must include http:// or https://">
+                    <Label required hint="http:// or https:// required">
                       Target Destination URL
                     </Label>
                     <Input
@@ -138,12 +256,18 @@ export default function WorkspacePage() {
                       onChange={(e) => setUrlInput(e.target.value)}
                       placeholder="https://example.com"
                       mono
+                      error={!urlValidation.isValid ? urlValidation.error : undefined}
                       startAdornment={<Globe className="h-4 w-4" />}
                     />
+                    {!urlValidation.isValid && urlValidation.error ? (
+                      <p className="mt-1.5 text-xs text-status-danger">
+                        {urlValidation.error}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 
-                {/* 2. Appearance & Customization */}
+                {/* Appearance & Geometry Panel */}
                 <div className="rounded-xl border border-border-subtle bg-surface p-4 shadow-panel flex flex-col gap-4">
                   <div className="flex items-center justify-between pb-2 border-b border-border-subtle">
                     <div className="flex items-center gap-2">
@@ -152,10 +276,9 @@ export default function WorkspacePage() {
                         Appearance & Geometry
                       </span>
                     </div>
-                    <Badge variant="subtle">Vector Precision</Badge>
                   </div>
 
-                  {/* Pattern Selection */}
+                  {/* Pattern & Error Correction */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label hint="Module shape">Pattern Style</Label>
@@ -169,7 +292,7 @@ export default function WorkspacePage() {
                     </div>
 
                     <div>
-                      <Label hint="Reed-Solomon recovery">Error Correction</Label>
+                      <Label hint="Reed-Solomon redundancy">Error Correction</Label>
                       <SegmentedControl
                         options={ECC_LEVELS}
                         value={ecc}
@@ -180,7 +303,7 @@ export default function WorkspacePage() {
                     </div>
                   </div>
 
-                  {/* Quiet Zone Slider */}
+                  {/* Margin / Quiet Zone Slider */}
                   <div className="pt-2">
                     <Slider
                       label="Quiet Zone (Margin)"
@@ -193,10 +316,10 @@ export default function WorkspacePage() {
                     />
                   </div>
 
-                  {/* Color Palette Controls */}
+                  {/* Foreground & Background Colors */}
                   <div className="pt-3 border-t border-border-subtle grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label hint="Hex or picker">Foreground Color</Label>
+                      <Label hint="Hex value or picker">Foreground Color</Label>
                       <div className="flex items-center gap-2">
                         <input
                           type="color"
@@ -215,7 +338,7 @@ export default function WorkspacePage() {
                     </div>
 
                     <div>
-                      <Label hint="Hex or picker">Background Color</Label>
+                      <Label hint="Hex value or picker">Background Color</Label>
                       <div className="flex items-center gap-2">
                         <input
                           type="color"
@@ -233,58 +356,19 @@ export default function WorkspacePage() {
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 3. Design System Tokens & Primitives Inspector */}
-                <div className="rounded-xl border border-border-subtle bg-surface/50 p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Palette className="h-4 w-4 text-foreground-secondary" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
-                      Design System Verification
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div className="p-2.5 rounded-lg border border-border-subtle bg-surface flex flex-col gap-1">
-                      <span className="text-[10px] text-foreground-muted font-mono">
-                        Primary Button
+                  {isLowContrast && (
+                    <div className="p-2.5 rounded-lg border border-amber-500/20 bg-amber-500/5 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
+                      <span>
+                        Low contrast between foreground and background may cause cameras to fail scanning.
                       </span>
-                      <Button variant="primary" size="sm" className="w-full">
-                        Action
-                      </Button>
                     </div>
-
-                    <div className="p-2.5 rounded-lg border border-border-subtle bg-surface flex flex-col gap-1">
-                      <span className="text-[10px] text-foreground-muted font-mono">
-                        Secondary
-                      </span>
-                      <Button variant="secondary" size="sm" className="w-full">
-                        Outline
-                      </Button>
-                    </div>
-
-                    <div className="p-2.5 rounded-lg border border-border-subtle bg-surface flex flex-col gap-1">
-                      <span className="text-[10px] text-foreground-muted font-mono">
-                        Ghost
-                      </span>
-                      <Button variant="ghost" size="sm" className="w-full">
-                        Cancel
-                      </Button>
-                    </div>
-
-                    <div className="p-2.5 rounded-lg border border-border-subtle bg-surface flex flex-col gap-1">
-                      <span className="text-[10px] text-foreground-muted font-mono">
-                        Danger
-                      </span>
-                      <Button variant="danger" size="sm" className="w-full">
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
-              {/* RIGHT COLUMN: Live QR Preview & Action Area (5 cols) */}
+              {/* RIGHT COLUMN: Live QR Preview & Actions (5 cols) */}
               <div className="lg:col-span-5 flex flex-col gap-4 sticky top-20">
                 <div className="rounded-xl border border-border-subtle bg-surface p-5 shadow-panel flex flex-col items-center">
                   {/* Canvas Header */}
@@ -297,101 +381,49 @@ export default function WorkspacePage() {
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <Badge variant="success" dot>
-                        Scannable
+                      <Badge variant={urlValidation.isValid ? "success" : "warning"} dot>
+                        {urlValidation.isValid ? "Scannable" : "Invalid Input"}
                       </Badge>
                       <span className="font-mono text-[11px] text-foreground-muted">
-                        512 × 512
+                        Vector SVG
                       </span>
                     </div>
                   </div>
 
                   {/* QR Canvas Frame */}
-                  <div className="relative flex items-center justify-center w-full aspect-square max-w-[340px] rounded-lg border border-border-subtle bg-canvas-subtle p-6">
-                    {/* Visual QR Simulation for Phase 1 Wireframe */}
-                    <div
-                      className="w-full h-full rounded-md shadow-subtle p-5 flex flex-col items-center justify-between transition-all"
-                      style={{ backgroundColor: bgColor, color: fgColor }}
-                    >
-                      {/* Top Eyes */}
-                      <div className="w-full flex justify-between">
-                        <div
-                          className="h-12 w-12 border-4 rounded-sm flex items-center justify-center p-1.5"
-                          style={{ borderColor: fgColor }}
-                        >
-                          <div
-                            className="h-5 w-5 rounded-xs"
-                            style={{ backgroundColor: fgColor }}
-                          />
-                        </div>
-                        <div
-                          className="h-12 w-12 border-4 rounded-sm flex items-center justify-center p-1.5"
-                          style={{ borderColor: fgColor }}
-                        >
-                          <div
-                            className="h-5 w-5 rounded-xs"
-                            style={{ backgroundColor: fgColor }}
-                          />
-                        </div>
+                  <div className="relative flex items-center justify-center w-full aspect-square max-w-[340px] rounded-lg border border-border-subtle bg-canvas-subtle p-6 overflow-hidden">
+                    {svgMarkup ? (
+                      <div
+                        className="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:max-w-full [&>svg]:max-h-full rounded-md shadow-subtle overflow-hidden"
+                        dangerouslySetInnerHTML={{ __html: svgMarkup }}
+                      />
+                    ) : (
+                      <div className="text-center p-6">
+                        <p className="text-xs text-foreground-secondary">
+                          Enter content to generate QR code
+                        </p>
                       </div>
-
-                      {/* Middle Matrix Simulation */}
-                      <div className="w-full py-2 flex flex-col gap-1 items-center justify-center opacity-85 font-mono text-[10px]">
-                        <div className="flex items-center gap-1">
-                          <span className="h-2 w-2 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-4 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-2 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-6 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-2 rounded-xs" style={{ backgroundColor: fgColor }} />
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="h-2 w-5 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-2 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-3 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-4 rounded-xs" style={{ backgroundColor: fgColor }} />
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="h-2 w-3 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-6 rounded-xs" style={{ backgroundColor: fgColor }} />
-                          <span className="h-2 w-2 rounded-xs" style={{ backgroundColor: fgColor }} />
-                        </div>
-                      </div>
-
-                      {/* Bottom Eye & Info */}
-                      <div className="w-full flex justify-between items-end">
-                        <div
-                          className="h-12 w-12 border-4 rounded-sm flex items-center justify-center p-1.5"
-                          style={{ borderColor: fgColor }}
-                        >
-                          <div
-                            className="h-5 w-5 rounded-xs"
-                            style={{ backgroundColor: fgColor }}
-                          />
-                        </div>
-                        <div className="text-[10px] font-mono text-right opacity-60">
-                          ECC {ecc} • {pattern}
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Summary Payload readout */}
+                  {/* Payload readout */}
                   <div className="w-full mt-4 p-2.5 rounded-lg bg-canvas-subtle border border-border-subtle text-xs">
                     <div className="flex items-center justify-between text-foreground-muted mb-1 text-[11px]">
-                      <span>Encoded Content</span>
+                      <span>Encoded Payload</span>
                       <span className="font-mono">{urlInput.length} chars</span>
                     </div>
                     <div className="font-mono text-foreground text-xs truncate">
-                      {urlInput || "Empty payload"}
+                      {urlInput || "—"}
                     </div>
                   </div>
 
-                  {/* Export & Clipboard Action Suite */}
+                  {/* Export Actions */}
                   <div className="w-full grid grid-cols-2 gap-2 mt-4">
                     <Button
                       variant="primary"
                       className="w-full"
-                      onClick={() => alert("Phase 1 verified: PNG export hook ready for Phase 6")}
+                      disabled={!urlValidation.isValid || isExporting}
+                      onClick={handleDownloadPng}
                     >
                       <Download className="h-3.5 w-3.5 mr-1.5" />
                       Download PNG
@@ -400,7 +432,8 @@ export default function WorkspacePage() {
                     <Button
                       variant="secondary"
                       className="w-full"
-                      onClick={() => alert("Phase 1 verified: Vector SVG export hook ready for Phase 6")}
+                      disabled={!urlValidation.isValid || isExporting}
+                      onClick={handleDownloadSvg}
                     >
                       <Download className="h-3.5 w-3.5 mr-1.5" />
                       Export SVG
@@ -411,7 +444,8 @@ export default function WorkspacePage() {
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={handleCopyMock}
+                      disabled={!urlValidation.isValid}
+                      onClick={handleCopy}
                     >
                       {copied ? (
                         <>
@@ -428,14 +462,14 @@ export default function WorkspacePage() {
                   </div>
                 </div>
 
-                {/* Privacy & Engine Architecture Notice */}
-                <div className="rounded-xl border border-border-subtle bg-surface/50 p-4 text-xs">
+                {/* Privacy Architecture Notice */}
+                <div className="rounded-xl border border-border-subtle bg-surface p-4 text-xs">
                   <div className="flex items-center gap-2 mb-1 text-foreground font-medium">
                     <Shield className="h-3.5 w-3.5 text-emerald-500" />
                     <span>Pure Browser Execution</span>
                   </div>
                   <p className="text-foreground-secondary text-[11px] leading-relaxed">
-                    All matrix generation and visual styling occur strictly client-side. No URL or user data is ever sent to a server.
+                    QR matrix generation and visual styling occur strictly client-side. No URL or user data is ever sent to a server.
                   </p>
                 </div>
               </div>
@@ -447,10 +481,10 @@ export default function WorkspacePage() {
               <Layers className="h-5 w-5 text-foreground-secondary" />
             </div>
             <h2 className="text-sm font-semibold text-foreground">
-              Scanner Module
+              QR Scanner
             </h2>
             <p className="text-xs text-foreground-secondary mt-1 max-w-xs mx-auto">
-              Camera scanning and drag-and-drop image decoding will be connected in Phase 8.
+              Scan QR codes using your device camera or upload image files.
             </p>
             <Button
               variant="secondary"
@@ -458,7 +492,7 @@ export default function WorkspacePage() {
               className="mt-5"
               onClick={() => setActiveTab("create")}
             >
-              Return to Workspace
+              Return to Generator
             </Button>
           </div>
         ) : (
@@ -467,10 +501,10 @@ export default function WorkspacePage() {
               <Shield className="h-5 w-5 text-foreground-secondary" />
             </div>
             <h2 className="text-sm font-semibold text-foreground">
-              Local History Module
+              Local History
             </h2>
             <p className="text-xs text-foreground-secondary mt-1 max-w-xs mx-auto">
-              IndexedDB local storage will be wired in Phase 7.
+              Recently generated QR codes will be stored locally on this device.
             </p>
             <Button
               variant="secondary"
@@ -478,7 +512,7 @@ export default function WorkspacePage() {
               className="mt-5"
               onClick={() => setActiveTab("create")}
             >
-              Return to Workspace
+              Return to Generator
             </Button>
           </div>
         )}

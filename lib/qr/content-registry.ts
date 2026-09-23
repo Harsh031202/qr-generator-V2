@@ -28,48 +28,48 @@ export const QR_TYPE_HANDLERS: {
   url: {
     type: "url",
     label: "URL",
-    defaultData: { url: "https://github.com" },
+    defaultData: { url: "" },
     validate: (data) => validateUrl(data.url),
     encode: (data) => encodePayload("url", data),
-    getSummary: (data) => data.url || "Empty URL",
+    getSummary: (data) => data.url.trim() || "Empty URL",
   },
 
   text: {
     type: "text",
     label: "Plain Text",
-    defaultData: { text: "Hello from QR Studio!" },
+    defaultData: { text: "" },
     validate: (data) => validateText(data.text),
     encode: (data) => encodePayload("text", data),
-    getSummary: (data) => (data.text ? `${data.text.slice(0, 48)}...` : "Empty text"),
+    getSummary: (data) => (data.text.trim() ? `${data.text.trim().slice(0, 48)}...` : "Empty text"),
   },
 
   wifi: {
     type: "wifi",
     label: "Wi-Fi",
-    defaultData: { ssid: "Studio_WiFi", password: "", security: "WPA", hidden: false },
+    defaultData: { ssid: "", password: "", security: "WPA", hidden: false },
     validate: (data) => validateWifi(data),
     encode: (data) => encodePayload("wifi", data),
     getSummary: (data) =>
-      data.ssid ? `Network: ${data.ssid} (${data.security})` : "Configure Wi-Fi",
+      data.ssid.trim() ? `Network: ${data.ssid.trim()} (${data.security})` : "Configure Wi-Fi",
   },
 
   vcard: {
     type: "vcard",
     label: "Contact",
     defaultData: {
-      firstName: "Alex",
-      lastName: "Rivera",
-      phone: "+1 555-0199",
-      email: "alex@example.com",
-      organization: "QR Studio",
-      title: "Product Lead",
-      url: "https://example.com",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      email: "",
+      organization: "",
+      title: "",
+      url: "",
     },
     validate: (data) => validateVCard(data),
     encode: (data) => encodePayload("vcard", data),
     getSummary: (data) =>
-      data.firstName
-        ? `${data.firstName} ${data.lastName || ""} • ${data.organization || data.phone || "vCard"}`.trim()
+      data.firstName.trim()
+        ? `${data.firstName.trim()} ${data.lastName?.trim() || ""} • ${data.organization?.trim() || data.phone?.trim() || "Contact"}`.trim()
         : "Contact Card",
   },
 
@@ -77,31 +77,31 @@ export const QR_TYPE_HANDLERS: {
     type: "email",
     label: "Email",
     defaultData: {
-      to: "contact@example.com",
-      subject: "Hello from QR Studio",
-      body: "Hi, I scanned your QR code and wanted to connect.",
+      to: "",
+      subject: "",
+      body: "",
     },
     validate: (data) => validateEmail(data.to),
     encode: (data) => encodePayload("email", data),
     getSummary: (data) =>
-      data.to ? `Mail to: ${data.to}${data.subject ? ` (${data.subject})` : ""}` : "Compose Email",
+      data.to.trim() ? `Mail to: ${data.to.trim()}${data.subject?.trim() ? ` (${data.subject.trim()})` : ""}` : "Compose Email",
   },
 
   upi: {
     type: "upi",
     label: "UPI Payment",
     defaultData: {
-      pa: "merchant@bank",
-      pn: "QR Studio Store",
-      am: "150.00",
-      tn: "Payment for order",
+      pa: "",
+      pn: "",
+      am: "",
+      tn: "",
       cu: "INR",
     },
     validate: (data) => validateUpi(data),
     encode: (data) => encodePayload("upi", data),
     getSummary: (data) =>
-      data.pa
-        ? `Pay ${data.am ? `₹${data.am} to ` : ""}${data.pn || data.pa}`
+      data.pa.trim()
+        ? `Pay ${data.am?.trim() ? `₹${data.am.trim()} to ` : ""}${data.pn?.trim() || data.pa.trim()}`
         : "UPI Payment Request",
   },
 };

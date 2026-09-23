@@ -4,23 +4,22 @@ export type QRContentType =
   | "wifi"
   | "vcard"
   | "email"
-  | "phone"
-  | "sms"
-  | "location"
-  | "upi"
-  | "event";
+  | "upi";
 
 export type QRErrorCorrection = "L" | "M" | "Q" | "H";
 
 export type QRPatternStyle = "square" | "rounded" | "dots";
 
-export type QRCornerStyle = "square" | "rounded" | "dot";
+export type QRCornerStyle = "square" | "rounded" | "circle";
+
+export type QROutputSize = 256 | 512 | 768 | 1024 | 2048;
 
 export interface QRLogoConfig {
   dataUrl: string;
   filename: string;
-  sizePercent: number; // 10% to 30%
+  sizePercent: number; // 10% to 28%
   hasPadding: boolean;
+  paddingSize?: number; // 0 to 4 modules
 }
 
 export interface QRAppearanceConfig {
@@ -28,17 +27,24 @@ export interface QRAppearanceConfig {
   backgroundColor: string;
   pattern: QRPatternStyle;
   cornerStyle: QRCornerStyle;
-  margin: number; // quiet zone (1 - 6)
+  margin: number; // quiet zone (1 - 6 modules)
   errorCorrection: QRErrorCorrection;
+  outputSize: QROutputSize;
   logo?: QRLogoConfig;
 }
 
+export type QRVerificationStatus =
+  | "idle"
+  | "verifying"
+  | "verified"
+  | "failed";
+
 export interface QRVerificationResult {
-  verified: boolean;
+  status: QRVerificationStatus;
   decodedPayload?: string;
-  warning?: string;
+  message?: string;
   contrastRatio: number;
-  contrastSufficient: boolean;
+  isGoodContrast: boolean;
 }
 
 export interface QRMetadata {

@@ -34,7 +34,6 @@ export function UrlForm({ value, onChange }: UrlFormProps) {
           mono
           error={showError ? validation.error : undefined}
           startAdornment={<Globe className="h-4 w-4" />}
-          autoFocus
         />
         {showError ? (
           <p className="mt-1.5 text-xs text-status-danger" role="alert">

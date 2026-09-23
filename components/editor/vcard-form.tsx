@@ -41,7 +41,6 @@ export function VCardForm({ value, onChange }: VCardFormProps) {
             placeholder="Jane"
             startAdornment={<User className="h-4 w-4" />}
             error={fnError}
-            autoFocus
           />
           {fnError ? (
             <p className="mt-1 text-xs text-status-danger" role="alert">

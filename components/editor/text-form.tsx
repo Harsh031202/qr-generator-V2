@@ -39,7 +39,6 @@ export function TextForm({ value, onChange }: TextFormProps) {
           placeholder="Enter any text, notes, or instructions..."
           className="min-h-[120px]"
           error={showError ? validation.error : undefined}
-          autoFocus
         />
 
         {showError ? (

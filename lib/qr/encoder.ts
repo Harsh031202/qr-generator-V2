@@ -2,7 +2,7 @@ import type { QRContentType } from "@/types/qr";
 
 /**
  * Interface for normalized QR content payloads.
- * Decouples domain form fields from the raw string payload passed to the QR renderer.
+ * Decouples form field representations from the raw string payload passed to the QR renderer.
  */
 export interface QRContentPayloadMap {
   url: {
@@ -31,36 +31,26 @@ export interface QRContentPayloadMap {
     subject?: string;
     body?: string;
   };
-  phone: {
-    number: string;
-  };
-  sms: {
-    phone: string;
-    message?: string;
-  };
-  location: {
-    latitude: number;
-    longitude: number;
-  };
   upi: {
-    pa: string; // Payee address (UPI ID)
-    pn: string; // Payee name
+    pa: string; // Payee Address (UPI ID)
+    pn?: string; // Payee Name
     am?: string; // Amount
-    tn?: string; // Note
-    cu?: string; // Currency (defaults to INR)
-  };
-  event: {
-    title: string;
-    startDate: string;
-    endDate?: string;
-    location?: string;
-    description?: string;
+    tn?: string; // Note / Remarks
+    cu?: string; // Currency
   };
 }
 
 /**
+ * Wi-Fi string escaping according to the ZXing standard:
+ * Escapes characters '\', ';', ',', ':', '"' with a leading backslash.
+ */
+function escapeWifi(str: string): string {
+  return str.replace(/([\\;,:\"])/g, "\\$1");
+}
+
+/**
  * Encoders convert structured data into standardized QR payload strings
- * conforming to industry standards (MECARD/vCard, MeBKM, mailto, WIFI, UPI).
+ * conforming to industry standards (RFC, ZXing, MECARD/vCard 3.0, NPCI UPI).
  */
 export const qrEncoders = {
   url: (data: QRContentPayloadMap["url"]): string => {
@@ -72,74 +62,85 @@ export const qrEncoders = {
   },
 
   wifi: (data: QRContentPayloadMap["wifi"]): string => {
-    const escape = (str: string) => str.replace(/([\\;,:"])/g, "\\$1");
-    const ssid = escape(data.ssid);
-    const pass = data.password ? escape(data.password) : "";
-    const type = data.security;
-    const hidden = data.hidden ? "H:true;" : "";
-    return `WIFI:T:${type};S:${ssid};P:${pass};${hidden};`;
+    const ssid = escapeWifi(data.ssid.trim());
+    const sec = data.security;
+    let payload = `WIFI:T:${sec};S:${ssid};`;
+    if (sec !== "nopass" && data.password) {
+      payload += `P:${escapeWifi(data.password)};`;
+    }
+    if (data.hidden) {
+      payload += "H:true;";
+    }
+    payload += ";";
+    return payload;
   },
 
   vcard: (data: QRContentPayloadMap["vcard"]): string => {
-    const lines = [
+    const first = data.firstName.trim();
+    const last = (data.lastName || "").trim();
+    const formattedName = last ? `${first} ${last}` : first;
+
+    const lines: string[] = [
       "BEGIN:VCARD",
       "VERSION:3.0",
-      `N:${data.lastName || ""};${data.firstName};;;`,
-      `FN:${data.firstName} ${data.lastName || ""}`.trim(),
+      `N:${last};${first};;;`,
+      `FN:${formattedName}`,
     ];
-    if (data.organization) lines.push(`ORG:${data.organization}`);
-    if (data.title) lines.push(`TITLE:${data.title}`);
-    if (data.phone) lines.push(`TEL;TYPE=CELL:${data.phone}`);
-    if (data.email) lines.push(`EMAIL:${data.email}`);
-    if (data.url) lines.push(`URL:${data.url}`);
+
+    if (data.organization?.trim()) {
+      lines.push(`ORG:${data.organization.trim()}`);
+    }
+    if (data.title?.trim()) {
+      lines.push(`TITLE:${data.title.trim()}`);
+    }
+    if (data.phone?.trim()) {
+      lines.push(`TEL;TYPE=CELL:${data.phone.trim()}`);
+    }
+    if (data.email?.trim()) {
+      lines.push(`EMAIL:${data.email.trim()}`);
+    }
+    if (data.url?.trim()) {
+      lines.push(`URL:${data.url.trim()}`);
+    }
+
     lines.push("END:VCARD");
     return lines.join("\n");
   },
 
   email: (data: QRContentPayloadMap["email"]): string => {
-    const params = new URLSearchParams();
-    if (data.subject) params.append("subject", data.subject);
-    if (data.body) params.append("body", data.body);
-    const query = params.toString();
-    return `mailto:${data.to.trim()}${query ? `?${query}` : ""}`;
-  },
+    const to = data.to.trim();
+    const queryParts: string[] = [];
 
-  phone: (data: QRContentPayloadMap["phone"]): string => {
-    return `tel:${data.number.replace(/\s+/g, "")}`;
-  },
+    if (data.subject?.trim()) {
+      queryParts.push(`subject=${encodeURIComponent(data.subject.trim())}`);
+    }
+    if (data.body?.trim()) {
+      queryParts.push(`body=${encodeURIComponent(data.body.trim())}`);
+    }
 
-  sms: (data: QRContentPayloadMap["sms"]): string => {
-    const num = data.phone.replace(/\s+/g, "");
-    return data.message ? `smsto:${num}:${data.message}` : `smsto:${num}`;
-  },
-
-  location: (data: QRContentPayloadMap["location"]): string => {
-    return `geo:${data.latitude},${data.longitude}`;
+    const query = queryParts.join("&");
+    return query ? `mailto:${to}?${query}` : `mailto:${to}`;
   },
 
   upi: (data: QRContentPayloadMap["upi"]): string => {
     const params = new URLSearchParams();
     params.append("pa", data.pa.trim());
-    params.append("pn", data.pn.trim());
-    if (data.am && Number(data.am) > 0) params.append("am", data.am);
-    if (data.tn) params.append("tn", data.tn);
-    params.append("cu", data.cu || "INR");
-    return `upi://pay?${params.toString()}`;
-  },
 
-  event: (data: QRContentPayloadMap["event"]): string => {
-    const lines = [
-      "BEGIN:VEVENT",
-      `SUMMARY:${data.title}`,
-      `DTSTART:${data.startDate.replace(/[-:]/g, "")}`,
-    ];
-    if (data.endDate) {
-      lines.push(`DTEND:${data.endDate.replace(/[-:]/g, "")}`);
+    if (data.pn?.trim()) {
+      params.append("pn", data.pn.trim());
     }
-    if (data.location) lines.push(`LOCATION:${data.location}`);
-    if (data.description) lines.push(`DESCRIPTION:${data.description}`);
-    lines.push("END:VEVENT");
-    return lines.join("\n");
+    if (data.am?.trim()) {
+      const num = Number(data.am.trim());
+      if (!isNaN(num) && num > 0) {
+        params.append("am", num.toFixed(2));
+      }
+    }
+    if (data.tn?.trim()) {
+      params.append("tn", data.tn.trim());
+    }
+    params.append("cu", data.cu || "INR");
+
+    return `upi://pay?${params.toString()}`;
   },
 };
 
@@ -147,7 +148,7 @@ export const qrEncoders = {
  * Universal payload serializer.
  * Given a type and its payload data, produces the standardized QR string.
  */
-export function encodePayload<K extends QRContentType>(
+export function encodePayload<K extends keyof QRContentPayloadMap>(
   type: K,
   data: QRContentPayloadMap[K]
 ): string {

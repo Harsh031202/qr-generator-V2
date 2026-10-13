@@ -10,6 +10,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        edumex: {
+          yellow: "#FFDE59",
+          green: "#05DF72",
+          purple: "#7C3AED",
+          blue: "#2563EB",
+          lightBlue: "#38BDF8",
+          charcoal: "#18181B",
+          cream: "#FAF9F5",
+        },
         canvas: {
           DEFAULT: "var(--bg-canvas)",
           subtle: "var(--bg-subtle)",
@@ -18,52 +27,35 @@ const config: Config = {
           DEFAULT: "var(--bg-surface)",
           hover: "var(--bg-surface-hover)",
           active: "var(--bg-surface-active)",
-          subtle: "var(--bg-surface-subtle)",
         },
         border: {
           subtle: "var(--border-subtle)",
           DEFAULT: "var(--border-default)",
-          hover: "var(--border-hover)",
-          focus: "var(--border-focus)",
         },
         foreground: {
           DEFAULT: "var(--text-primary)",
           secondary: "var(--text-secondary)",
           muted: "var(--text-muted)",
-          faint: "var(--text-faint)",
         },
-        accent: {
-          DEFAULT: "var(--accent-primary)",
-          hover: "var(--accent-hover)",
-          muted: "var(--accent-muted)",
-          foreground: "var(--accent-foreground)",
-        },
-        status: {
-          success: "var(--status-success)",
-          warning: "var(--status-warning)",
-          danger: "var(--status-danger)",
-        },
-      },
-      borderRadius: {
-        xs: "4px",
-        sm: "6px",
-        md: "8px",
-        lg: "10px",
-        xl: "12px",
       },
       boxShadow: {
-        subtle: "0 1px 2px 0 rgba(0, 0, 0, 0.04)",
-        panel: "0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08)",
-        dropdown: "0 4px 12px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08)",
+        hard: "4px 4px 0px #000000",
+        "hard-sm": "2px 2px 0px #000000",
+        "hard-lg": "6px 6px 0px #000000",
+        "hard-xl": "8px 8px 0px #000000",
+        "hard-blue": "4px 4px 0px #2563EB",
+        "hard-purple": "4px 4px 0px #7C3AED",
+        "hard-green": "4px 4px 0px #05DF72",
+        "hard-yellow": "4px 4px 0px #FFDE59",
       },
       fontFamily: {
         sans: [
+          "'Plus Jakarta Sans'",
+          "'Outfit'",
           "-apple-system",
           "BlinkMacSystemFont",
           "'Segoe UI'",
           "Roboto",
-          "Helvetica",
-          "Arial",
           "sans-serif",
         ],
         mono: [
@@ -71,11 +63,22 @@ const config: Config = {
           "SFMono-Regular",
           "Menlo",
           "Monaco",
-          "Consolas",
-          "'Liberation Mono'",
-          "'Courier New'",
           "monospace",
         ],
+      },
+      keyframes: {
+        wiggle: {
+          "0%, 100%": { transform: "rotate(-2deg)" },
+          "50%": { transform: "rotate(2deg)" },
+        },
+        floatSlow: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+      },
+      animation: {
+        wiggle: "wiggle 3s ease-in-out infinite",
+        "float-slow": "floatSlow 4s ease-in-out infinite",
       },
     },
   },

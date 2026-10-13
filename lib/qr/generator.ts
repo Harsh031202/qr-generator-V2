@@ -17,6 +17,7 @@ export interface QRRenderOptions {
   backgroundColor?: string;
   pattern?: QRPatternStyle;
   cornerStyle?: QRCornerStyle;
+  animate?: boolean;
 }
 
 /**
@@ -57,6 +58,8 @@ export function isFinderPattern(
 
 /**
  * Generates an SVG string representation of the QR code entirely client-side.
+ * Supports "squares", "rounded", and "dots" pattern styles with high scannability.
+ * When `animate: true`, groups modules into staggered horizontal layers for 3D jelly drop animations.
  */
 export async function generateQRSvg(
   payload: string,
@@ -67,41 +70,177 @@ export async function generateQRSvg(
     margin = 4,
     foregroundColor = "#000000",
     backgroundColor = "#ffffff",
+    pattern = "square",
+    animate = false,
   } = options;
 
-  return QRCode.toString(payload, {
-    type: "svg",
+  if (!payload || payload.trim() === "") {
+    return "";
+  }
+
+  const qr = QRCode.create(payload, {
     errorCorrectionLevel: errorCorrection,
-    margin,
-    color: {
-      dark: foregroundColor,
-      light: backgroundColor,
-    },
   });
+
+  const size = qr.modules.size;
+  const totalSize = size + margin * 2;
+
+  const elements: string[] = [];
+
+  // Background rectangle
+  if (backgroundColor && backgroundColor.toLowerCase() !== "transparent") {
+    elements.push(
+      `<rect width="${totalSize}" height="${totalSize}" fill="${backgroundColor}" />`
+    );
+  }
+
+  // Helper: check if (r, c) is part of a 7x7 finder pattern
+  const isFinder = (r: number, c: number) => {
+    if (r < 7 && c < 7) return true;
+    if (r < 7 && c >= size - 7) return true;
+    if (r >= size - 7 && c < 7) return true;
+    return false;
+  };
+
+  // 1. Finder Pattern Eyes (Anchors)
+  const center = (size - 1) / 2;
+  const maxDist = Math.max(1, center * Math.SQRT2);
+  const WAVE_DURATION = 0.44; // Total wave transit time from center to furthest corner (seconds)
+
+  const finders: [number, number, number, number][] = [
+    [0, 0, 3.5, 3.5], // Top-Left
+    [0, size - 7, size - 3.5, 3.5], // Top-Right
+    [size - 7, 0, 3.5, size - 3.5], // Bottom-Left
+  ];
+
+  finders.forEach(([fr, fc, ecx, ecy]) => {
+    const fx = margin + fc;
+    const fy = margin + fr;
+
+    const dx = ecx - center;
+    const dy = ecy - center;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const eyeDelay = ((dist / maxDist) * WAVE_DURATION).toFixed(3);
+    const eyeClass = animate
+      ? ` class="qr-ripple-eye" style="animation-delay: ${eyeDelay}s;"`
+      : "";
+
+    const eyeShapes: string[] = [];
+    if (pattern === "dots") {
+      eyeShapes.push(
+        `<rect x="${fx}" y="${fy}" width="7" height="7" rx="2" fill="${foregroundColor}" />`,
+        `<rect x="${fx + 1}" y="${fy + 1}" width="5" height="5" rx="1.2" fill="${backgroundColor}" />`,
+        `<circle cx="${fx + 3.5}" cy="${fy + 3.5}" r="1.5" fill="${foregroundColor}" />`
+      );
+    } else if (pattern === "rounded") {
+      eyeShapes.push(
+        `<rect x="${fx}" y="${fy}" width="7" height="7" rx="1.6" fill="${foregroundColor}" />`,
+        `<rect x="${fx + 1}" y="${fy + 1}" width="5" height="5" rx="1" fill="${backgroundColor}" />`,
+        `<rect x="${fx + 2}" y="${fy + 2}" width="3" height="3" rx="0.8" fill="${foregroundColor}" />`
+      );
+    } else {
+      eyeShapes.push(
+        `<rect x="${fx}" y="${fy}" width="7" height="7" fill="${foregroundColor}" />`,
+        `<rect x="${fx + 1}" y="${fy + 1}" width="5" height="5" fill="${backgroundColor}" />`,
+        `<rect x="${fx + 2}" y="${fy + 2}" width="3" height="3" fill="${foregroundColor}" />`
+      );
+    }
+
+    elements.push(`<g${eyeClass}>${eyeShapes.join("")}</g>`);
+  });
+
+  // 2. Data Modules with Circular Ripple Delay Radiating from Center
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (isFinder(r, c) || !qr.modules.get(r, c)) continue;
+
+      const mx = margin + c;
+      const my = margin + r;
+
+      const dx = (c + 0.5) - center;
+      const dy = (r + 0.5) - center;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const delay = (Math.min(1, dist / maxDist) * WAVE_DURATION).toFixed(3);
+      const animAttr = animate
+        ? ` class="qr-ripple-module" style="animation-delay: ${delay}s;"`
+        : "";
+
+      if (pattern === "dots") {
+        elements.push(
+          `<circle cx="${mx + 0.5}" cy="${my + 0.5}" r="0.51" fill="${foregroundColor}"${animAttr} />`
+        );
+      } else if (pattern === "rounded") {
+        elements.push(
+          `<rect x="${mx}" y="${my}" width="1" height="1" rx="0.32" fill="${foregroundColor}"${animAttr} />`
+        );
+      } else {
+        elements.push(
+          `<rect x="${mx}" y="${my}" width="1" height="1" fill="${foregroundColor}"${animAttr} />`
+        );
+      }
+    }
+  }
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalSize} ${totalSize}">`,
+    ...elements,
+    `</svg>`,
+  ].join("");
 }
 
 /**
  * Generates a PNG Data URL entirely client-side in the browser.
+ * Respects custom patterns ("squares", "rounded", "dots") and colors.
  */
 export async function generateQRPngDataUrl(
   payload: string,
   width: number = 512,
   options: QRRenderOptions = {}
 ): Promise<string> {
-  const {
-    errorCorrection = "M",
-    margin = 4,
-    foregroundColor = "#000000",
-    backgroundColor = "#ffffff",
-  } = options;
+  const svg = await generateQRSvg(payload, options);
+  if (!svg) return "";
+
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const svgBase64 = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = width;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Could not initialize canvas context"));
+          return;
+        }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, width, width);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => {
+        // Fallback to standard qrcode
+        QRCode.toDataURL(payload, {
+          width,
+          errorCorrectionLevel: options.errorCorrection ?? "M",
+          margin: options.margin ?? 4,
+          color: {
+            dark: options.foregroundColor ?? "#000000",
+            light: options.backgroundColor ?? "#ffffff",
+          },
+        }).then(resolve).catch(reject);
+      };
+      img.src = svgBase64;
+    });
+  }
 
   return QRCode.toDataURL(payload, {
     width,
-    errorCorrectionLevel: errorCorrection,
-    margin,
+    errorCorrectionLevel: options.errorCorrection ?? "M",
+    margin: options.margin ?? 4,
     color: {
-      dark: foregroundColor,
-      light: backgroundColor,
+      dark: options.foregroundColor ?? "#000000",
+      light: options.backgroundColor ?? "#ffffff",
     },
   });
 }

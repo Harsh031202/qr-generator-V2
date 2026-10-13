@@ -1,3 +1,4 @@
+import { Agentation } from "agentation";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -55,6 +56,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-canvas text-foreground antialiased selection:bg-foreground selection:text-canvas">
         {children}
+        {process.env.NODE_ENV === "development" && (
+          <Agentation />
+        )}
       </body>
     </html>
   );

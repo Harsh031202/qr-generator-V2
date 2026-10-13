@@ -12,6 +12,7 @@ export interface SliderProps
   onChange: (value: number) => void;
   unit?: string;
   label?: string;
+  showValue?: boolean;
 }
 
 export function Slider({
@@ -22,6 +23,7 @@ export function Slider({
   onChange,
   unit = "",
   label,
+  showValue = false,
   className,
   disabled,
   ...props
@@ -32,11 +34,13 @@ export function Slider({
     <div className={cn("w-full flex flex-col gap-1.5 select-none", className)}>
       {label ? (
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-foreground">{label}</span>
-          <span className="font-mono text-foreground-secondary text-[11px]">
-            {value}
-            {unit}
-          </span>
+          <span className="font-bold text-black dark:text-white">{label}</span>
+          {showValue && (
+            <span className="font-mono text-slate-600 dark:text-slate-400 text-[11px]">
+              {value}
+              {unit}
+            </span>
+          )}
         </div>
       ) : null}
       <div className="relative flex items-center h-5">
@@ -49,12 +53,11 @@ export function Slider({
           disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
           className={cn(
-            "w-full h-1.5 rounded-full appearance-none bg-canvas-subtle border border-border-subtle cursor-pointer focus:outline-none",
-            "accent-accent-primary",
+            "w-full h-2 rounded-full appearance-none bg-slate-200 dark:bg-slate-700 border-2 border-black dark:border-zinc-700 cursor-pointer focus:outline-none accent-black dark:accent-[#c084fc]",
             disabled && "opacity-50 cursor-not-allowed"
           )}
           style={{
-            background: `linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) ${percentage}%, var(--border-default) ${percentage}%, var(--border-default) 100%)`,
+            background: `linear-gradient(to right, var(--slider-fill, #ffde59) 0%, var(--slider-fill, #ffde59) ${percentage}%, var(--slider-track, #e2e8f0) ${percentage}%, var(--slider-track, #e2e8f0) 100%)`,
           }}
           {...props}
         />

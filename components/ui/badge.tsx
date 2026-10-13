@@ -16,31 +16,31 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variants = {
-    default: "bg-[#e7e7ff] text-[#696cff] dark:bg-[#696cff]/20 dark:text-[#a3a6ff]",
-    primary: "bg-[#e7e7ff] text-[#696cff] dark:bg-[#696cff]/20 dark:text-[#a3a6ff]",
-    success: "bg-[#e8fadf] text-[#71dd37] dark:bg-[#71dd37]/20",
-    warning: "bg-[#fff2d6] text-[#ffab00] dark:bg-[#ffab00]/20",
-    danger: "bg-[#ffe0db] text-[#ff3e1d] dark:bg-[#ff3e1d]/20",
-    info: "bg-[#d7f5fc] text-[#03c3ec] dark:bg-[#03c3ec]/20",
-    subtle: "bg-canvas text-[#697a8d] dark:text-[#a3a8c8] border border-border-subtle",
-    outline: "bg-transparent text-[#696cff] border border-[#696cff]",
+    default: "bg-[#ffde59] text-black border-2 border-black dark:bg-[#c084fc] dark:text-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    primary: "bg-[#2563eb] text-white border-2 border-black dark:bg-[#c084fc] dark:text-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    success: "bg-[#05df72] text-black border-2 border-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    warning: "bg-[#ffde59] text-black border-2 border-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    danger: "bg-[#ff3e1d] text-white border-2 border-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    info: "bg-[#38bdf8] text-black border-2 border-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    subtle: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border-2 border-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
+    outline: "bg-white dark:bg-slate-900 text-black dark:text-white border-2 border-black dark:border-zinc-700 shadow-[1.5px_1.5px_0px_#000]",
   };
 
   const dotVariants = {
-    default: "bg-[#696cff]",
-    primary: "bg-[#696cff]",
-    success: "bg-[#71dd37]",
-    warning: "bg-[#ffab00]",
-    danger: "bg-[#ff3e1d]",
-    info: "bg-[#03c3ec]",
-    subtle: "bg-[#8592a3]",
-    outline: "bg-[#696cff]",
+    default: "bg-black",
+    primary: "bg-white dark:bg-black",
+    success: "bg-black",
+    warning: "bg-black",
+    danger: "bg-white",
+    info: "bg-black",
+    subtle: "bg-black dark:bg-white",
+    outline: "bg-black dark:bg-white",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full select-none tracking-tight transition-all",
+        "inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-black rounded-lg select-none tracking-tight transition-all",
         variants[variant],
         className
       )}

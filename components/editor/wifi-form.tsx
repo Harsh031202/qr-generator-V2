@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { Wifi, Lock, Eye, EyeOff } from "lucide-react";
+import { Wifi, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import type { QRContentPayloadMap } from "@/lib/qr/encoder";
 import { validateWifi } from "@/lib/validation/qr-validators";
 
@@ -53,9 +53,13 @@ export function WifiForm({ value, onChange }: WifiFormProps) {
           autoFocus
         />
         {ssidError ? (
-          <p className="mt-1.5 text-xs text-status-danger" role="alert">
-            {ssidError}
-          </p>
+          <div
+            className="mt-2.5 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+            <span>{ssidError}</span>
+          </div>
         ) : null}
       </div>
 
@@ -98,22 +102,26 @@ export function WifiForm({ value, onChange }: WifiFormProps) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="hover:text-foreground p-0.5"
+                className="p-1 rounded-lg border-2 border-black dark:border-zinc-700 bg-white dark:bg-slate-800 text-black dark:text-white shadow-[1px_1px_0px_#000] hover:bg-slate-100 dark:hover:bg-slate-700 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer"
                 title={showPassword ? "Hide password" : "Show password"}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <EyeOff className="h-3.5 w-3.5" />
+                  <EyeOff className="h-3.5 w-3.5 stroke-[2.5]" />
                 ) : (
-                  <Eye className="h-3.5 w-3.5" />
+                  <Eye className="h-3.5 w-3.5 stroke-[2.5]" />
                 )}
               </button>
             }
           />
           {passError ? (
-            <p className="mt-1.5 text-xs text-status-danger" role="alert">
-              {passError}
-            </p>
+            <div
+              className="mt-2.5 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+              role="alert"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+              <span>{passError}</span>
+            </div>
           ) : null}
         </div>
       )}

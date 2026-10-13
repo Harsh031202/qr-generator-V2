@@ -4,7 +4,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail } from "lucide-react";
+import { Mail, AlertCircle } from "lucide-react";
 import type { QRContentPayloadMap } from "@/lib/qr/encoder";
 import { validateEmail } from "@/lib/validation/qr-validators";
 
@@ -19,7 +19,7 @@ export function EmailForm({ value, onChange }: EmailFormProps) {
   const showError = touched && !validation.isValid && Boolean(validation.error);
 
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className="flex flex-col gap-4">
       {/* Recipient */}
       <div>
         <Label required hint="Recipient address">
@@ -39,9 +39,13 @@ export function EmailForm({ value, onChange }: EmailFormProps) {
           autoFocus
         />
         {showError ? (
-          <p className="mt-1.5 text-xs text-status-danger" role="alert">
-            {validation.error}
-          </p>
+          <div
+            className="mt-2.5 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+            <span>{validation.error}</span>
+          </div>
         ) : null}
       </div>
 
@@ -62,7 +66,7 @@ export function EmailForm({ value, onChange }: EmailFormProps) {
           value={value.body || ""}
           onChange={(e) => onChange({ ...value, body: e.target.value })}
           placeholder="Type your default message here..."
-          className="min-h-[100px]"
+          className="min-h-[110px]"
         />
       </div>
     </div>

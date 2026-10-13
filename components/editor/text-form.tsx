@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { AlertCircle, AlertTriangle } from "lucide-react";
 import type { QRContentPayloadMap } from "@/lib/qr/encoder";
 import { validateText, isHighDensityPayload } from "@/lib/validation/qr-validators";
 
@@ -21,12 +22,9 @@ export function TextForm({ value, onChange }: TextFormProps) {
     <div className="flex flex-col gap-3">
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <Label required className="mb-0">
+          <Label required className="mb-0" hint="Multi-line supported">
             Plain Text Content
           </Label>
-          <span className="font-mono text-[11px] text-foreground-muted">
-            {value.text.length} chars
-          </span>
         </div>
 
         <Textarea
@@ -37,22 +35,27 @@ export function TextForm({ value, onChange }: TextFormProps) {
           }}
           onBlur={() => setTouched(true)}
           placeholder="Enter any text, notes, or instructions..."
-          className="min-h-[120px]"
+          className="min-h-[130px]"
           error={showError ? validation.error : undefined}
           autoFocus
         />
 
         {showError ? (
-          <p className="mt-1.5 text-xs text-status-danger" role="alert">
-            {validation.error}
-          </p>
+          <div
+            className="mt-3 px-3 py-2 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+            <span>{validation.error}</span>
+          </div>
         ) : isDense ? (
-          <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
-            This QR contains a lot of data and may be harder to scan at smaller sizes.
-          </p>
+          <div className="mt-3 px-3 py-2 rounded-xl border-2 border-black dark:border-amber-700 bg-[#ffde59] dark:bg-amber-950/60 text-black dark:text-amber-200 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+            <span>This QR contains a lot of data and may require higher resolution or a closer scan.</span>
+          </div>
         ) : (
-          <p className="mt-1.5 text-[11px] text-foreground-muted">
-            Supports Unicode, multi-line text, and special symbols.
+          <p className="mt-2 text-xs font-bold text-slate-500 dark:text-zinc-400">
+            Supports Unicode, multi-line text, emojis, and special symbols.
           </p>
         )}
       </div>

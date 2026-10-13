@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Phone, Mail, Building, Globe } from "lucide-react";
+import { User, Phone, Mail, Building, Globe, AlertCircle } from "lucide-react";
 import type { QRContentPayloadMap } from "@/lib/qr/encoder";
 import { validateVCard } from "@/lib/validation/qr-validators";
 
@@ -26,9 +26,9 @@ export function VCardForm({ value, onChange }: VCardFormProps) {
   const urlError = touchedFields.url ? validation.fieldErrors?.url : undefined;
 
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className="flex flex-col gap-4">
       {/* Name fields row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
           <Label required>First Name</Label>
           <Input
@@ -44,9 +44,13 @@ export function VCardForm({ value, onChange }: VCardFormProps) {
             autoFocus
           />
           {fnError ? (
-            <p className="mt-1 text-xs text-status-danger" role="alert">
-              {fnError}
-            </p>
+            <div
+              className="mt-2 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+              role="alert"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+              <span>{fnError}</span>
+            </div>
           ) : null}
         </div>
 
@@ -61,7 +65,7 @@ export function VCardForm({ value, onChange }: VCardFormProps) {
       </div>
 
       {/* Contact info row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
           <Label hint="Mobile / Work">Phone Number</Label>
           <Input
@@ -88,15 +92,19 @@ export function VCardForm({ value, onChange }: VCardFormProps) {
             error={emailError}
           />
           {emailError ? (
-            <p className="mt-1 text-xs text-status-danger" role="alert">
-              {emailError}
-            </p>
+            <div
+              className="mt-2 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+              role="alert"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+              <span>{emailError}</span>
+            </div>
           ) : null}
         </div>
       </div>
 
       {/* Organization and Title */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
           <Label hint="Company / Team">Organization</Label>
           <Input
@@ -133,9 +141,13 @@ export function VCardForm({ value, onChange }: VCardFormProps) {
           error={urlError}
         />
         {urlError ? (
-          <p className="mt-1 text-xs text-status-danger" role="alert">
-            {urlError}
-          </p>
+          <div
+            className="mt-2 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+            <span>{urlError}</span>
+          </div>
         ) : null}
       </div>
     </div>

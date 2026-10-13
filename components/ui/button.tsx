@@ -25,30 +25,30 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-semibold transition-all duration-200 select-none disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none rounded-lg active:scale-[0.98]";
+      "inline-flex items-center justify-center font-bold tracking-tight select-none disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none rounded-xl border-2 border-black dark:border-zinc-700 transition-all duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none";
 
     const variants = {
       primary:
-        "bg-[#696cff] text-white hover:bg-[#5f61e6] active:bg-[#5659e0] shadow-md shadow-[#696cff]/25 hover:shadow-lg hover:shadow-[#696cff]/35",
+        "bg-[#2563eb] hover:bg-[#1d4ed8] dark:bg-[#c084fc] dark:hover:bg-[#a855f7] text-white dark:text-black shadow-[3px_3px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000]",
       secondary:
-        "bg-surface text-[#566a7f] dark:text-[#cfd3ec] hover:bg-canvas hover:text-[#696cff] active:bg-canvas-subtle border border-border-default shadow-sm",
+        "bg-white dark:bg-slate-800 text-black dark:text-white shadow-[3px_3px_0px_#000] hover:bg-slate-50 dark:hover:bg-slate-700 hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000]",
       outline:
-        "bg-transparent text-[#696cff] hover:bg-[#696cff] hover:text-white border border-[#696cff] active:bg-[#5f61e6]",
+        "bg-transparent text-black dark:text-white shadow-[2px_2px_0px_#000] hover:bg-black/5 dark:hover:bg-white/5",
       ghost:
-        "bg-transparent text-[#566a7f] dark:text-[#cfd3ec] hover:text-[#696cff] hover:bg-[#e7e7ff]/50 dark:hover:bg-[#696cff]/15",
+        "border-transparent shadow-none hover:border-black dark:hover:border-zinc-700 hover:shadow-[2px_2px_0px_#000] text-black dark:text-white",
       danger:
-        "bg-[#ff3e1d] text-white hover:bg-[#e6381a] shadow-md shadow-[#ff3e1d]/25",
+        "bg-[#ff3e1d] hover:bg-[#e03517] text-white shadow-[3px_3px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000]",
       success:
-        "bg-[#71dd37] text-white hover:bg-[#64c431] shadow-md shadow-[#71dd37]/25",
+        "bg-[#05df72] hover:bg-[#04c263] text-black shadow-[3px_3px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000]",
       info:
-        "bg-[#03c3ec] text-white hover:bg-[#02afd4] shadow-md shadow-[#03c3ec]/25",
+        "bg-[#ffde59] hover:bg-[#fed633] text-black shadow-[3px_3px_0px_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000]",
     };
 
     const sizes = {
       sm: "h-8 px-3 text-xs gap-1.5",
-      md: "h-9 px-4 text-xs gap-2",
-      lg: "h-11 px-5 text-sm gap-2.5",
-      icon: "h-9 w-9 p-0",
+      md: "h-10 px-4 text-xs gap-2",
+      lg: "h-12 px-5 text-sm gap-2.5",
+      icon: "h-10 w-10 p-0",
     };
 
     return (

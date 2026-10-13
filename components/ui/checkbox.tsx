@@ -24,7 +24,14 @@ export function Checkbox({
   const inputId = id || generatedId;
 
   return (
-    <div className={cn("flex items-start gap-2.5 select-none", className)}>
+    <div
+      onClick={() => !disabled && onCheckedChange(!checked)}
+      className={cn(
+        "flex items-start gap-3 select-none p-3 rounded-xl border-2 border-black dark:border-zinc-700 bg-white dark:bg-slate-800/80 shadow-[2px_2px_0px_#000] hover:bg-slate-50 dark:hover:bg-slate-800 hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer",
+        disabled && "opacity-50 cursor-not-allowed pointer-events-none",
+        className
+      )}
+    >
       <div className="relative flex items-center justify-center pt-0.5">
         <input
           id={inputId}
@@ -36,17 +43,14 @@ export function Checkbox({
           {...props}
         />
         <div
-          onClick={() => !disabled && onCheckedChange(!checked)}
           className={cn(
-            "h-4 w-4 rounded border transition-colors flex items-center justify-center cursor-pointer",
-            "peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-1",
+            "h-5 w-5 rounded-lg border-2 border-black dark:border-zinc-600 transition-all flex items-center justify-center shadow-[1px_1px_0px_#000]",
             checked
-              ? "bg-accent text-accent-foreground border-accent"
-              : "bg-surface border-border-default hover:border-border-hover",
-            disabled && "opacity-50 cursor-not-allowed"
+              ? "bg-[#ffde59] text-black dark:bg-[#c084fc] dark:text-black border-black dark:border-black font-black"
+              : "bg-slate-100 dark:bg-slate-900"
           )}
         >
-          {checked && <Check className="h-3 w-3 stroke-[2.5]" />}
+          {checked && <Check className="h-3.5 w-3.5 stroke-[3.5]" />}
         </div>
       </div>
 
@@ -55,14 +59,14 @@ export function Checkbox({
           <label
             htmlFor={inputId}
             className={cn(
-              "font-medium text-foreground cursor-pointer leading-tight",
+              "font-black text-black dark:text-white cursor-pointer leading-tight",
               disabled && "opacity-50 cursor-not-allowed"
             )}
           >
             {label}
           </label>
           {description ? (
-            <span className="text-[11px] text-foreground-muted mt-0.5">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 mt-0.5">
               {description}
             </span>
           ) : null}

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, User, Tag } from "lucide-react";
+import { CreditCard, User, Tag, AlertCircle } from "lucide-react";
 import type { QRContentPayloadMap } from "@/lib/qr/encoder";
 import { validateUpi } from "@/lib/validation/qr-validators";
 
@@ -25,7 +25,7 @@ export function UpiForm({ value, onChange }: UpiFormProps) {
   const amError = touchedFields.am ? validation.fieldErrors?.am : undefined;
 
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className="flex flex-col gap-4">
       {/* UPI ID (VPA) */}
       <div>
         <Label required hint="username@bank">
@@ -45,14 +45,18 @@ export function UpiForm({ value, onChange }: UpiFormProps) {
           autoFocus
         />
         {paError ? (
-          <p className="mt-1.5 text-xs text-status-danger" role="alert">
-            {paError}
-          </p>
+          <div
+            className="mt-2 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+            <span>{paError}</span>
+          </div>
         ) : null}
       </div>
 
       {/* Payee Name & Amount */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
           <Label hint="Optional recipient name">Payee Name</Label>
           <Input
@@ -78,12 +82,16 @@ export function UpiForm({ value, onChange }: UpiFormProps) {
             placeholder="0.00"
             mono
             error={amError}
-            startAdornment={<span className="font-sans text-xs">₹</span>}
+            startAdornment={<span className="font-sans text-xs font-black">₹</span>}
           />
           {amError ? (
-            <p className="mt-1 text-xs text-status-danger" role="alert">
-              {amError}
-            </p>
+            <div
+              className="mt-2 px-3 py-1.5 rounded-xl border-2 border-black dark:border-red-900 bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 font-bold text-xs shadow-[2px_2px_0px_#000] flex items-center gap-2"
+              role="alert"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0 stroke-[2.5]" />
+              <span>{amError}</span>
+            </div>
           ) : null}
         </div>
       </div>
@@ -99,8 +107,8 @@ export function UpiForm({ value, onChange }: UpiFormProps) {
         />
       </div>
 
-      <p className="text-[11px] text-foreground-muted mt-1">
-        Generates a standard Unified Payments Interface (UPI) URI. Compatible with UPI-enabled banking apps.
+      <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 mt-1">
+        Generates a standard Unified Payments Interface (UPI) URI. Compatible with Google Pay, PhonePe, Paytm, and banking apps.
       </p>
     </div>
   );

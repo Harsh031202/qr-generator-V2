@@ -72,14 +72,14 @@ export function BrutalFooter() {
       id: "github",
       label: "GitHub",
       handle: "Harsh031202",
-      href: "https://github.com/Harsh031202/qr-generator-V2",
+      href: "https://github.com/Harsh031202",
       icon: <GithubIcon className="w-5 h-5" />,
       cardHoverClass:
         "hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black hover:border-black dark:hover:border-white",
       iconBoxClass:
         "bg-white dark:bg-slate-900 text-black dark:text-white border-black dark:border-zinc-700 group-hover:bg-white group-hover:text-black group-hover:border-black dark:group-hover:bg-black dark:group-hover:text-white dark:group-hover:border-black",
       isMail: false,
-      ariaLabel: "Visit GitHub repository by Harsh031202",
+      ariaLabel: "Visit GitHub profile of Harsh031202",
     },
     {
       id: "linkedin",

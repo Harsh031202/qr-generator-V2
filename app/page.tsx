@@ -5,6 +5,7 @@ import { BrutalHeader, type WorkspaceTab } from "@/components/layout/brutal-head
 import { BrutalQRGenerator } from "@/components/qr/brutal-qr-generator";
 import { BrutalQRScanner } from "@/components/qr/brutal-qr-scanner";
 import { BrutalQRHistory, type HistoryItem } from "@/components/qr/brutal-qr-history";
+import { BrutalFooter } from "@/components/layout/brutal-footer";
 import { QRIntro } from "@/components/layout/qr-intro";
 import { cn } from "@/lib/utils";
 
@@ -140,6 +141,9 @@ export default function WorkspacePage() {
               />
             </div>
           )}
+
+          {/* Neo-brutalist Get In Touch Footer */}
+          <BrutalFooter />
         </main>
       </div>
     </>

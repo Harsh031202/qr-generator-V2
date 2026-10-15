@@ -3,6 +3,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://qrstudio-v2.vercel.app"
+  ),
   title: "QR Studio — Client-Side QR Code Generator & Scanner",
   description:
     "A fast, privacy-respecting QR code generator and scanner. Generate, customize, verify, and export vector SVGs and high-res PNGs entirely inside your browser.",
@@ -14,10 +17,37 @@ export const metadata: Metadata = {
     "vCard QR",
     "UPI QR",
     "client-side QR",
+    "neo-brutalist QR",
   ],
-  authors: [{ name: "QR Studio" }],
+  authors: [{ name: "Harsh Kumar Harsh", url: "https://github.com/Harsh031202" }],
+  creator: "Harsh Kumar Harsh",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "QR Studio",
+    title: "QR Studio — Client-Side QR Code Generator & Scanner",
+    description:
+      "A fast, privacy-respecting QR code generator and scanner. Generate, customize, verify, and export vector SVGs and high-res PNGs entirely inside your browser.",
+    images: [
+      {
+        url: "/og-preview.png",
+        width: 1024,
+        height: 576,
+        alt: "QR Studio — A QR Code Generator & Scanner Suite",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "QR Studio — Client-Side QR Code Generator & Scanner",
+    description:
+      "A fast, privacy-respecting QR code generator and scanner. Generate, customize, verify, and export vector SVGs and high-res PNGs entirely inside your browser.",
+    images: ["/og-preview.png"],
+    creator: "@thatoneguy3122",
+  },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/og-preview.png",
   },
 };
 

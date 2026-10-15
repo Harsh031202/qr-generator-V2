@@ -19,11 +19,46 @@ Issue](https://github.com/Harsh031202/qr-generator-V2/issues)
 
 ## Screenshots
 
-```{=html}
-<!-- Add screenshots below when ready. Example:
-![QR Studio workspace](screenshots/workspace.png)
--->
-```
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="Screenshots/Choose What You Want to Share.png" alt="Home Page" width="100%">
+      <br>
+      <b>Home Page</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="Screenshots/Step 2_ Customize Appearance & Colors.png" alt="Customisation" width="100%">
+      <br>
+      <b>Customisation</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="Screenshots/QR Studio Final Step Interface.png" alt="Preview" width="100%">
+      <br>
+      <b>Preview</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="Screenshots/qrstudio_client_side_scanner_promo.png" alt="Scanner" width="100%">
+      <br>
+      <b>Scanner</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="Screenshots/qrstudio_saved_history_promo.png" alt="History" width="100%">
+      <br>
+      <b>History</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="Screenshots/QR Studio Dark Mode Showcase.png" alt="Dark Mode" width="100%">
+      <br>
+      <b>Dark Mode</b>
+    </td>
+  </tr>
+</table>
+
+
 ## Overview
 
 QR Studio lets you create QR codes for common types of information,

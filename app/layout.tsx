@@ -2,10 +2,16 @@ import { Agentation } from "agentation";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : null) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+  "https://qr-codegenerator-three.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://qrstudio-v2.vercel.app"
-  ),
+  metadataBase: new URL(siteUrl),
   title: "QR Studio — Client-Side QR Code Generator & Scanner",
   description:
     "A fast, privacy-respecting QR code generator and scanner. Generate, customize, verify, and export vector SVGs and high-res PNGs entirely inside your browser.",
@@ -24,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "/",
+    url: siteUrl,
     siteName: "QR Studio",
     title: "QR Studio — Client-Side QR Code Generator & Scanner",
     description:
@@ -32,8 +38,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-preview.png",
-        width: 1024,
-        height: 576,
+        width: 1200,
+        height: 630,
+        type: "image/png",
         alt: "QR Studio — A QR Code Generator & Scanner Suite",
       },
     ],
@@ -47,7 +54,9 @@ export const metadata: Metadata = {
     creator: "@thatoneguy3122",
   },
   icons: {
-    icon: "/og-preview.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/og-preview.png",
   },
 };
 
@@ -74,6 +83,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&display=swap"
           rel="stylesheet"
         />
+        <link rel="image_src" href="/og-preview.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

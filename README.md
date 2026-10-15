@@ -1,85 +1,96 @@
-# QR Studio
+<div align="center">
+<h1> QR Studio </h1>
 
-QR Studio is a browser-based tool for creating, customizing, and reading
-QR codes. It supports common QR payloads such as website links, plain
-text, Wi-Fi credentials, contact cards, email drafts, and UPI payment
-details.
+A browser-based workspace for creating, customizing, and scanning QR
+codes.
 
-**Live demo:** https://qr-codegenerator-three.vercel.app/\
-**Repository:** https://github.com/Harsh031202/qr-generator-V2
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind
+CSS](https://img.shields.io/badge/Tailwind_CSS-%20styling-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Live
+Demo](https://img.shields.io/badge/Live-Demo-22c55e?logo=vercel&logoColor=white)](https://qr-codegenerator-three.vercel.app/)
 
-## What it does
+[Live Demo](https://qr-codegenerator-three.vercel.app/) · [Report an
+Issue](https://github.com/Harsh031202/qr-generator-V2/issues)
+
+</div>
+
+## Screenshots
+
+```{=html}
+<!-- Add screenshots below when ready. Example:
+![QR Studio workspace](screenshots/workspace.png)
+-->
+```
+## Overview
+
+QR Studio lets you create QR codes for common types of information,
+adjust their appearance, and decode QR codes from uploaded images. The
+interface brings generation, scanning, and recent-code history into one
+workspace.
+
+## Features
 
 ### Create QR codes
 
--   Generate QR codes for URLs, text, Wi-Fi networks, vCards, email
-    messages, and UPI payment requests.
--   See the QR preview update as you edit the input.
--   Change foreground and background colors.
+-   Generate codes for URLs, plain text, Wi-Fi networks, contact cards
+    (vCards), email messages, and UPI payment details.
+-   Preview the QR code while editing its content.
+-   Customize foreground and background colors.
 -   Adjust the quiet-zone margin and error-correction level.
--   Export the result as SVG or PNG, with a selectable PNG resolution.
--   Copy the generated QR image to the clipboard where browser
-    permissions allow it.
--   Start with sample presets for a URL, Wi-Fi network, or contact card.
+-   Export as PNG with a selectable resolution or as SVG.
+-   Copy the generated QR image to the clipboard when supported by the
+    browser.
+-   Start with sample presets for URLs, Wi-Fi, and contact cards.
 
 ### Scan QR images
 
--   Upload an image containing a QR code, or drag and drop it into the
-    scanner.
--   Decode the content in the browser.
--   Display recognized data in structured fields when the payload is a
-    supported type.
--   Copy decoded values and inspect the raw payload.
--   Hide or reveal decoded Wi-Fi passwords.
+-   Upload or drag and drop an image containing a QR code.
+-   Decode the code in the browser.
+-   View recognized content in structured fields for supported payload
+    types.
+-   Copy decoded values or inspect the raw payload.
+-   Show or hide decoded Wi-Fi passwords.
 
-### Review recent codes
+### History
 
--   Open the History tab to revisit generated codes.
--   Edit a saved entry in the generator or remove individual entries.
--   Clear the current history when needed.
+-   Revisit recently generated codes from the History tab.
+-   Edit a history entry in the generator or remove individual entries.
+-   Clear the current history.
 
-History is maintained in the current page state, so it is temporary and
-may reset when the page is refreshed or closed.
+**History note:** Recent-code history is held in the current page state.
+It is temporary and may reset when you refresh or close the page.
 
 ## Tech stack
 
--   **Next.js 15** with the App Router
--   **React 19** and **TypeScript**
--   **Tailwind CSS** for styling
--   [`qrcode`](https://www.npmjs.com/package/qrcode) for QR generation
--   [`jsQR`](https://github.com/cozmo/jsQR) for decoding QR codes from
-    images
--   **Lucide React** for icons
-
-The interface uses a neo-brutalist visual style, with a responsive
-two-column workspace and light/dark themes.
+-   **Next.js 15** --- App Router
+-   **React 19** --- UI
+-   **TypeScript** --- application types
+-   **Tailwind CSS** --- styling
+-   **`qrcode`** --- QR code generation
+-   **`jsQR`** --- QR code decoding
+-   **Lucide React** --- icons
 
 ## Run locally
 
-You will need Node.js and npm installed.
+### Requirements
 
-1.  Clone the repository:
+-   [Node.js](https://nodejs.org/) and npm
 
-    ``` bash
-    git clone https://github.com/Harsh031202/qr-generator-V2.git
-    cd qr-generator-V2
-    ```
+### Setup
 
-2.  Install dependencies:
+``` bash
+git clone https://github.com/Harsh031202/qr-generator-V2.git
+cd qr-generator-V2
+npm install
+npm run dev
+```
 
-    ``` bash
-    npm install
-    ```
+Open <http://localhost:3000> in your browser.
 
-3.  Start the development server:
-
-    ``` bash
-    npm run dev
-    ```
-
-4.  Open <http://localhost:3000>.
-
-To create and run a production build:
+### Production build
 
 ``` bash
 npm run build
@@ -92,32 +103,31 @@ npm run start
 qr-generator-V2/
 ├── app/                    # App Router pages, layout, and global styles
 ├── components/
-│   ├── editor/              # Forms for each QR content type
-│   ├── layout/              # Main navigation and workspace layout
-│   ├── qr/                  # QR generator, scanner, and history
-│   └── ui/                  # Reusable UI components and icons
+│   ├── editor/             # Forms for QR content types
+│   ├── layout/             # Navigation and workspace layout
+│   ├── qr/                 # QR generator, scanner, and history
+│   └── ui/                 # Reusable UI components and icons
 ├── lib/
-│   ├── qr/                  # QR generation, encoding, and decoding
-│   └── validation/          # Input and QR payload validation
-├── types/                   # Shared TypeScript types
+│   ├── qr/                 # QR generation, encoding, and decoding
+│   └── validation/         # Input and payload validation
+├── types/                  # Shared TypeScript types
 ├── package.json
 └── tailwind.config.ts
 ```
 
 ## Notes
 
--   QR generation and image decoding are implemented on the client side.
-    The project does not require a separate application server or
-    database for these features.
--   A QR code stores the data encoded into it. Creating a QR code here
-    does not make a static code dynamically editable after it has been
-    printed.
--   Clipboard access depends on browser support and permissions.
--   Only scan QR codes from sources you trust. A QR code can contain a
-    link to a malicious website or other untrusted content.
+-   QR generation and image decoding run on the client side; these
+    features do not require a separate application server or database.
+-   A static QR code contains the data encoded when it was created. It
+    cannot be edited after printing unless it points to a destination
+    you control.
+-   Clipboard functionality depends on browser support and permissions.
+-   Check links before opening them. QR codes can contain malicious or
+    otherwise untrusted URLs.
 
 ## License
 
-No license file is currently included in this repository. If you intend
-to make the project open source, add a `LICENSE` file that states the
-terms under which others may use, modify, and distribute it.
+No license file is currently included in this repository. Add a
+`LICENSE` file if you want to specify how others may use, modify, and
+distribute this project.

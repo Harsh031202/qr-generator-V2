@@ -42,7 +42,6 @@ export function UpiForm({ value, onChange }: UpiFormProps) {
           mono
           startAdornment={<CreditCard className="h-4 w-4" />}
           error={paError}
-          autoFocus
         />
         {paError ? (
           <div

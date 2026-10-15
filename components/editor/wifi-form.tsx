@@ -50,7 +50,6 @@ export function WifiForm({ value, onChange }: WifiFormProps) {
           placeholder="e.g. Studio_5G"
           startAdornment={<Wifi className="h-4 w-4" />}
           error={ssidError}
-          autoFocus
         />
         {ssidError ? (
           <div

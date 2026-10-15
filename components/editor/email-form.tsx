@@ -36,7 +36,6 @@ export function EmailForm({ value, onChange }: EmailFormProps) {
           placeholder="hello@example.com"
           startAdornment={<Mail className="h-4 w-4" />}
           error={showError ? validation.error : undefined}
-          autoFocus
         />
         {showError ? (
           <div

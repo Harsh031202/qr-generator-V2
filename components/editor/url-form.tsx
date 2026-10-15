@@ -49,7 +49,6 @@ export function UrlForm({ value, onChange }: UrlFormProps) {
           mono
           error={showError ? validation.error : undefined}
           startAdornment={<Globe className="h-4 w-4" />}
-          autoFocus
         />
 
         {/* Quick Protocol Selector Pills */}

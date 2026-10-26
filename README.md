@@ -161,8 +161,3 @@ qr-generator-V2/
 -   Check links before opening them. QR codes can contain malicious or
     otherwise untrusted URLs.
 
-## License
-
-No license file is currently included in this repository. Add a
-`LICENSE` file if you want to specify how others may use, modify, and
-distribute this project.
